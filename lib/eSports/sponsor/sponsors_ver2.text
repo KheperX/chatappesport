@@ -1,0 +1,92 @@
+import 'package:app/eSports/sponsor/sponsors_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+class Sponsors extends StatefulWidget {
+  const Sponsors({super.key});
+
+  @override
+  State<Sponsors> createState() => _SponsorsState();
+}
+
+class _SponsorsState extends State<Sponsors> {
+  List<Widget> widgets = [];
+  @override
+  void initState() {
+    super.initState();
+    readData();
+  }
+
+  Future<Null> readData() async {
+    await Firebase.initializeApp().then((value) async {
+      print("Initialize Success");
+      await FirebaseFirestore.instance
+          .collection('sponsors')
+          .orderBy('company')
+          .snapshots()
+          .listen((event) {
+        print('snapshot = ${event.docs}');
+        for (var snapshots in event.docs) {
+          Map<String, dynamic> map = snapshots.data();
+          print('map = $map');
+          SponsorsModel model = SponsorsModel.fromMap(map);
+          print('company = ${model.company}');
+          setState(() {
+            widgets.add(createWidget(model));
+          });
+        }
+      });
+    });
+  }
+
+  Widget createWidget(SponsorsModel model) => Card(
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 100,
+                child: Image.network(model.image_url),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                model.company,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                model.phone,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Text(
+                model.email,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: widgets.length == 0
+          ? Center(child: CircularProgressIndicator())
+          : GridView.extent(
+              maxCrossAxisExtent: 300,
+              children: widgets,
+            ),
+    );
+  }
+}

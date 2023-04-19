@@ -1,0 +1,148 @@
+import 'package:app/eSports/sponsor/sponsors_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+class Sponsors extends StatefulWidget {
+  const Sponsors({super.key});
+
+  @override
+  State<Sponsors> createState() => _SponsorsState();
+}
+
+class _SponsorsState extends State<Sponsors> {
+  static List<SponsorsModel> main_sponsor_list = [
+    SponsorsModel(
+        "TCP ",
+        "02 999 9999",
+        "https://www.thai-tba.or.th/wp-content/uploads/2019/09/tcp-company-logo.png",
+        "michael@dayrep.com",
+        "Interest to support profession gamers"),
+    SponsorsModel(
+        "Honda",
+        "02 888 8888",
+        "https://www.otoruyasi.com/wp-content/uploads/2017/09/Honda-logo.png",
+        "hondath@dayrep.com",
+        "Interest to support profession gamers"),
+    SponsorsModel(
+        "Toyota",
+        "02 555 5555",
+        "https://tnn-guard.com/wp-content/uploads/2019/05/Toyota-Logo.jpg",
+        "toyotath@dayrep.com",
+        "Interest to support profession gamers"),
+    SponsorsModel(
+        "Milo",
+        "02 666 6699",
+        "https://seeklogo.com/images/M/Milo-logo-AF2F5B3622-seeklogo.com.png",
+        "miloofficial@dayrep.com",
+        "Interest to support profession gamers"),
+    SponsorsModel(
+        "Coca Cola",
+        "02 445 6699",
+        "https://seeklogo.com/images/C/coca-cola-circle-logo-A9EBD3B00A-seeklogo.com.png",
+        "thomasnewman@dayrep.com",
+        "Interest to support profession gamers"),
+    SponsorsModel(
+        "Tao Kae Noi",
+        "02 445 5544",
+        "https://medias.thansettakij.com/media/images/2017/05/08/1551361739_147323.jpg",
+        "taokaenoi@dayrep.com",
+        "Interest to support profession gamers"),
+  ];
+
+  //creating the list that we're going to display and filter
+  List<SponsorsModel> display_list = List.from(main_sponsor_list);
+
+  void updateList(String value) {
+    //this is the function that will filter our list
+    setState(() {
+      display_list = main_sponsor_list
+          .where((element) =>
+              element.company!.toLowerCase().contains(value.toLowerCase()))
+          .toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFF1f1545),
+      appBar: AppBar(
+        title: Text("Sponsors List"),
+        backgroundColor: Color(0xFF1f1545),
+        elevation: 0.0,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Search for Sponsors",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22.0,
+                  fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            TextField(
+              onChanged: (value) => updateList(value),
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Color(0xff302360),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                  borderSide: BorderSide.none,
+                ),
+                hintText: "eg: Toyota",
+                suffixIcon: Icon(Icons.search),
+                prefixIcon: Icon(Icons.search),
+                prefixIconColor: Colors.purple.shade900,
+              ),
+            ),
+            SizedBox(
+              height: 20.0,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: display_list.length,
+                itemBuilder: (context, index) => ListTile(
+                  contentPadding: EdgeInsets.all(8.0),
+                  title: Text(
+                    display_list[index].company!,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    children: [
+                      // Text(
+                      //   '${display_list[index].phone!}',
+                      //   style: TextStyle(color: Colors.white60),
+                      // ),
+                      Text(
+                        '${display_list[index].description!}',
+                        style: TextStyle(color: Colors.white60),
+                      ),
+                    ],
+                  ),
+                  trailing: Text(
+                    "${display_list[index].phone}", // !  ??
+                    style: TextStyle(color: Colors.amber),
+                  ),
+                  leading: Image.network(
+                    display_list[index].image_url!,
+                    height: 100,
+                    width: 80,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
