@@ -2,6 +2,7 @@ import 'package:app/chat/home_page.dart';
 import 'package:app/chat/profile_page.dart';
 import 'package:app/eSports/authentication/models/helper_function.dart';
 import 'package:app/eSports/newblog/views/newblog.dart';
+import 'package:app/eSports/news/views/news_article.dart';
 import 'package:app/eSports/profile/views/profile.dart';
 import 'package:app/eSports/service/auth_service.dart';
 import 'package:app/eSports/service/database_service.dart';
@@ -327,7 +328,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => NewsScreen()));
+                                builder: (context) => NewsScreen2()));
                       },
                       child: Container(
                         decoration: BoxDecoration(

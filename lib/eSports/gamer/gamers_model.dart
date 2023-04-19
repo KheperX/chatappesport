@@ -15,8 +15,8 @@ class GamersModel {
   String experience;
   String description;
   String url;
-  String followers;
-  String following;
+  int followers;
+  int following;
   String posts;
   String game2;
   String game2_image;
@@ -49,8 +49,8 @@ class GamersModel {
     String? experience,
     String? description,
     String? url,
-    String? followers,
-    String? following,
+    int? followers,
+    int? following,
     String? posts,
     String? game2,
     String? game2_image,
@@ -106,8 +106,8 @@ class GamersModel {
       experience: map['experience'] as String,
       description: map['description'] as String,
       url: map['url'] as String,
-      followers: map['followers'] as String,
-      following: map['following'] as String,
+      followers: map['followers'] as int,
+      following: map['following'] as int,
       posts: map['posts'] as String,
       game2: map['game2'] as String,
       game2_image: map['game2_image'] as String,
@@ -115,8 +115,6 @@ class GamersModel {
   }
 
   String toJson() => json.encode(toMap());
-
-  // factory GamersModel.fromJson(String source) => GamersModel.fromMap(json.decode(source) as Map<String, dynamic>);
 
   @override
   String toString() {
@@ -163,3 +161,20 @@ class GamersModel {
         game2_image.hashCode;
   }
 }
+
+/*
+
+factory GamersModel.fromMap(Map<String, dynamic> map, String id) {
+    return GamersModel(
+      id: id,
+      name: map['name'] as String,
+      phone: map['phone'] as String,
+      email: map['email'] as String,
+      game: map['game'] as String,
+      image_url: map['image_url'] as String,
+      experience: map['experience'] as String,
+      description: map['description'] as String,
+    );
+  }
+
+ */

@@ -6,6 +6,10 @@ import 'gamers_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+//  create a Firestore instance which you can use to read and write data to and from the database.
+final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class GamerProfile extends StatefulWidget {
   GamerProfile({super.key, required this.id});
@@ -45,17 +49,39 @@ class _GamerProfileState extends State<GamerProfile> {
     });
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Scaffold(
-  //     appBar: AppBar(
-  //       title: Text(widget.id),
-  //     ),
-  //     body: isLoading
-  //         ? Center(child: CircularProgressIndicator())
-  //         : Text(gamersData.name),
-  //   );
-  // }
+// Get the current user ID
+  String getCurrentUserId() {
+    User? currentUser = FirebaseAuth.instance.currentUser;
+    return currentUser!.uid;
+  }
+
+  bool isFollowing = false;
+
+  void _toggleFollow() {
+    setState(() {
+      isFollowing = !isFollowing;
+    });
+
+    // get the current user ID and pro player ID
+    final String userId = getCurrentUserId();
+    final String proPlayerId = widget.id;
+
+    // update the pro players table
+    DocumentReference proPlayerRef =
+        _firestore.collection('proplayers').doc(proPlayerId);
+    proPlayerRef.update({
+      'followers':
+          isFollowing ? FieldValue.increment(1) : FieldValue.increment(-1),
+    });
+
+    // update the users table
+    DocumentReference userRef = _firestore.collection('users').doc(userId);
+    userRef.update({
+      'following': isFollowing
+          ? FieldValue.arrayUnion([proPlayerId])
+          : FieldValue.arrayRemove([proPlayerId]),
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,12 +89,9 @@ class _GamerProfileState extends State<GamerProfile> {
 
     return Scaffold(
       backgroundColor: kLighterWhite,
-      body: Column(
-        children: [
-          if (isLoading) Center(child: CircularProgressIndicator()),
-          Visibility(
-            visible: !isLoading && gamersData != null,
-            child: SingleChildScrollView(
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
               padding: const EdgeInsets.symmetric(
                 horizontal: 30,
               ),
@@ -129,14 +152,12 @@ class _GamerProfileState extends State<GamerProfile> {
                                   borderRadius: BorderRadius.circular(
                                     kBorderRadius,
                                   ),
-                                  color: kBlue,
+                                  color: Colors.transparent,
                                 ),
-                                child: Text(
-                                  'Following',
-                                  style: kPoppinsMedium.copyWith(
-                                      color: kWhite,
-                                      fontSize:
-                                          SizeConfig.blockSizeHorizontal! * 3),
+                                child: ElevatedButton(
+                                  onPressed: _toggleFollow,
+                                  child:
+                                      Text(isFollowing ? 'Unfollow' : 'Follow'),
                                 ),
                               ),
                             ],
@@ -228,7 +249,7 @@ class _GamerProfileState extends State<GamerProfile> {
                             child: Column(
                               children: [
                                 Text(
-                                  gamersData!.following,
+                                  gamersData!.following.toString(),
                                   style: kPoppinsBold.copyWith(
                                       color: kWhite,
                                       fontSize:
@@ -247,6 +268,13 @@ class _GamerProfileState extends State<GamerProfile> {
                         ],
                       ),
                     ),
+                    // SizedBox(
+                    //   height: 10,
+                    // ),
+                    // ElevatedButton(
+                    //   onPressed: _toggleFollow,
+                    //   child: Text(isFollowing ? 'Unfollow' : 'Follow'),
+                    // ),
                     SizedBox(
                       height: 10,
                     ),
@@ -391,9 +419,36 @@ class _GamerProfileState extends State<GamerProfile> {
                 ),
               ),
             ),
-          ),
-        ],
-      ),
     );
   }
+
+  // followingButton() {
+  //   currentUserId = FirebaseAuth auth = FirebaseAuth.instance;
+  //   if (auth.currentUser != null) {
+  //     print(auth.currentUser.uid);
+  //   }
+
+  //   bool isProfileOwner = currentUserId == widget.id ;
+  //   if (isFollowing) {
+  //     return Text('Unfollow', function: handleUnfollowUser);
+  //   }
+  // } else if (!isFollowing) {
+  //   return Text('Follow')
+  // }
+
+  // Container buildButton({String text, Function function}) {
+  //   return Container(
+  //     padding: EdgeInsets.only(top: 2.0),
+  //     child: ElevatedButton(
+  //       onPressed: function,
+  //     child: Container(
+  //       width: 250.0,
+  //       height: 27.0,
+  //       child: Text(text, style: TextStyle(
+  //         color: isFollowing ? Colors.black : Colors.white,
+  //         fontWeight: FontWeight.bold,
+  //       ),),
+  //     )),
+  //   );
+  // }
 }
