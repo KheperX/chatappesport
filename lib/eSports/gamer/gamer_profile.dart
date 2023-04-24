@@ -7,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //  create a Firestore instance which you can use to read and write data to and from the database.
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -24,10 +25,14 @@ class _GamerProfileState extends State<GamerProfile> {
   GamersModel? gamersData;
   bool isLoading = true;
 
+  late SharedPreferences _prefs;
+  bool isFollowing = false;
+
   @override
   void initState() {
     super.initState();
     readData();
+    initPrefs();
   }
 
   Future<void> readData() async {
@@ -49,13 +54,19 @@ class _GamerProfileState extends State<GamerProfile> {
     });
   }
 
+  Future<void> initPrefs() async {
+    _prefs = await SharedPreferences.getInstance();
+    String userId = getCurrentUserId();
+    String proPlayerId = widget.id;
+    isFollowing = _prefs.getBool('$userId-$proPlayerId') ?? false;
+    setState(() {});
+  }
+
 // Get the current user ID
   String getCurrentUserId() {
     User? currentUser = FirebaseAuth.instance.currentUser;
     return currentUser!.uid;
   }
-
-  bool isFollowing = false;
 
   void _toggleFollow() {
     setState(() {
@@ -81,6 +92,9 @@ class _GamerProfileState extends State<GamerProfile> {
           ? FieldValue.arrayUnion([proPlayerId])
           : FieldValue.arrayRemove([proPlayerId]),
     });
+
+    // store the follow status in local storage
+    _prefs.setBool('$userId-$proPlayerId', isFollowing);
   }
 
   @override
